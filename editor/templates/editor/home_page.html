@@ -1,0 +1,220 @@
+{% load static %}
+
+<!doctype html>
+<head>
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'editor/main.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'editor/new.css' %}">
+
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"
+            integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+
+    <title>Run Python</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script
+            src="https://code.jquery.com/jquery-3.5.1.min.js"
+            integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
+            crossorigin="anonymous"></script>
+    <script src='https://meet.jit.si/external_api.js'></script>
+    <script>
+    $(document).ready(function () {
+        const domain = 'meet.jit.si';
+        const options = {
+            roomName: 'F303F581-8B65-4FDD-B883-7E4FBA87C290',
+            width: 500,
+            height: 500,
+            parentNode: document.getElementById("meet")
+        };
+        const api = new JitsiMeetExternalAPI(domain, options);
+    });
+    </script>
+</head>
+<div class="header">
+    <h1>Mock Interview</h1>
+    {#  <p>Resize the browser window to see the responsive effect.</p>#}
+</div>
+<div id="meet"></div>
+
+
+<div class="select">
+    <label for="slct"></label><select name="slct" id="slct">
+    <option value="python">Python</option>
+    <option value="ruby">Ruby</option>
+    <option value="cpp">C++</option>
+    <option value="c">C</option>
+    <option value="java">Java</option>
+    <option value="javascript">JavaScript</option>
+</select>
+</div>
+
+
+<!--First Column-->
+
+<div class="main">
+
+    <div class="form-group1">
+
+        <label for="script_text_area">
+
+        </label><textarea class="form-control" id="script_text_area" rows="20" style="background-color:#dddddd4f; color:#000000;">print(123)
+print('abc')
+
+
+def add(a, b):
+    return a + b
+
+
+add(1, 2)
+</textarea>
+
+    </div>
+    <!--second column-->
+
+    <div class="form-group2">
+        <p>Result</p>
+        <label for="script_result"></label><textarea class="form-control" id="script_result" rows="20"
+                                                     readonly="readonly"
+                                                     style="background-color:#dddddd;color:#333333;"></textarea>
+
+    </div>
+
+    <div class="buttons">
+        <button type="button" class="btn btn-success flow-left mt-5" id="run_python_script">Run Code</button>
+        {#        <button type="button" class="btn btn-success flow-left mt-5" id="submit">Submit</button>#}
+        <button type="button" class="btn btn-success flow-left mt-5" id="download">Download Code</button>
+
+    </div>
+</div>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+<script>
+$(document).on("click", '#run_python_script', function (e) {
+    let txt = $('#script_text_area').val();
+    console.log(txt);
+
+    var e = document.getElementById("slct");
+    let language = e.options[e.selectedIndex].value;
+    $.ajax({
+        url: "{% url 'result' %}",
+        type: "POST",
+        data: {
+            'script': txt,
+            'language': language,
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+        },
+        dataType: 'json',
+        success: function (data) {
+            console.log(data);
+            $("#script_result").val(data["output"]);
+        },
+        error: function (data) {
+            console.log("error");
+            console.log(data);
+        }
+    });
+});
+</script>
+<script>
+function openCity(evt, cityName) {
+    var i, x, tablinks;
+    x = document.getElementsByClassName("city");
+    for (i = 0; i < x.length; i++) {
+        x[i].style.display = "none";
+    }
+    tablinks = document.getElementsByClassName("tablink");
+    for (i = 0; i < x.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" w3-red", "");
+    }
+    document.getElementById(cityName).style.display = "block";
+    evt.currentTarget.className += " w3-red";
+}
+</script>
+
+
+<script>
+function triggerChangeEvent(option) {
+    // set selected property
+    option.selected = true;
+
+    // raise event on parent <select> element
+    if ("createEvent" in document) {
+        var evt = document.createEvent("HTMLEvents");
+        evt.initEvent("change", false, true);
+        option.parentNode.dispatchEvent(evt);
+    } else {
+        option.parentNode.fireEvent("onchange");
+    }
+}
+
+
+(function setup() {
+    const sel = document.querySelector('#slct');
+    sel.onchange = () => {
+
+        pythonCode = `print(123)
+print('abc')
+
+
+def add(a, b):
+    return a + b
+
+
+add(1, 2)
+`;
+        rubyCode = `age = 32
+multiplier = 10
+age * multiplier
+
+total = age * multiplier
+
+
+puts total
+
+
+def test(a1 = "Ruby", a2 = "Perl")
+
+end
+test "C", "C++"
+test
+`;
+        cppCode = `#include <iostream>
+using namespace std;
+
+
+int main()
+{
+   cout << "hellocpp";
+   return 0;
+}
+`;
+
+        code = '';
+        if (sel.value === 'python') {
+            code = pythonCode;
+        } else if (sel.value === 'ruby') {
+            code = rubyCode;
+        } else if (sel.value === 'cpp') {
+            code = cppCode;
+        } else {
+            code = '';
+        }
+
+        document.querySelector('#script_text_area').textContent = code;
+    };
+})();
+
+function runTest() {
+    const sel = document.querySelector('#selector').value;
+    const optionEl = document.querySelector(sel);
+    triggerChangeEvent(optionEl);
+}
+</script>

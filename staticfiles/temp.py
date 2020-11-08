@@ -1,9 +1,9 @@
-print(123)
-print('abc')
+#include <iostream>
+using namespace std;
 
 
-def add(a, b):
-    return a + b
-
-
-add(1, 2)
+int main()
+{
+   cout << "hellocpp123";
+   return 0;
+}

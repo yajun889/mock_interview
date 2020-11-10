@@ -4,6 +4,6 @@ using namespace std;
 
 int main()
 {
-   cout << "hellocpp123";
+   cout << "hellocpp";
    return 0;
 }

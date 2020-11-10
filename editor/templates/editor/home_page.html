@@ -10,7 +10,6 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="{% static 'editor/main.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'editor/new.css' %}">
 
 
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"
@@ -63,7 +62,8 @@
 
         <label for="script_text_area">
 
-        </label><textarea class="form-control" id="script_text_area" rows="20" style="background-color:#dddddd4f; color:#000000;">print(123)
+        </label><textarea class="form-control" id="script_text_area" rows="20"
+                          style="background-color:#dddddd4f; color:#000000;">print(123)
 print('abc')
 
 
@@ -78,7 +78,6 @@ add(1, 2)
     <!--second column-->
 
     <div class="form-group2">
-        <p>Result</p>
         <label for="script_result"></label><textarea class="form-control" id="script_result" rows="20"
                                                      readonly="readonly"
                                                      style="background-color:#dddddd;color:#333333;"></textarea>
@@ -87,8 +86,8 @@ add(1, 2)
 
     <div class="buttons">
         <button type="button" class="btn btn-success flow-left mt-5" id="run_python_script">Run Code</button>
-        {#        <button type="button" class="btn btn-success flow-left mt-5" id="submit">Submit</button>#}
-        <button type="button" class="btn btn-success flow-left mt-5" id="download">Download Code</button>
+        <button type="button" class="btn btn-success flow-left mt-5" id="download_code">Download Code</button>
+        <button type="button" class="btn btn-danger flow-left mt-5" id="reset_code">Reset</button>
 
     </div>
 </div>
@@ -121,6 +120,45 @@ $(document).on("click", '#run_python_script', function (e) {
             console.log(data);
         }
     });
+});
+
+$(document).on("click", '#download_code', function (e) {
+    function saveFile(name, type, data) {
+        if (data !== null && navigator.msSaveBlob)
+            return navigator.msSaveBlob(new Blob([data], {type: type}), name);
+        var a = $("<a style='display: none;'/>");
+        var url = window.URL.createObjectURL(new Blob([data], {type: type}));
+        a.attr("href", url);
+        a.attr("download", name);
+        $("body").append(a);
+        a[0].click();
+        window.URL.revokeObjectURL(url);
+        a.remove();
+    }
+
+    var selectDD = document.getElementById("slct");
+    var language = selectDD.value;
+    var fileType = 'txt';
+    if (language === 'python') {
+        fileType = 'py';
+    } else if (language === 'ruby') {
+        fileType = 'rb';
+    } else if (language === 'cpp') {
+        fileType = 'cpp';
+    } else {
+        fileType = 'txt';
+    }
+
+    let fileName = 'code.' + fileType;
+    let txt = $('#script_text_area').val();
+    saveFile(fileName, "data:attachment/text", txt);
+});
+
+
+$(document).on("click", '#reset_code', function (e) {
+    document.getElementById("script_text_area").value = "";
+    $("#script_result").val('');
+
 });
 </script>
 <script>

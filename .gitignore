@@ -1,6 +1,7 @@
 .idea/
 running/
 staticfiles/
+test/
 .DS_Store
 out2
 # Byte-compiled / optimized / DLL files
